@@ -1,0 +1,5 @@
+不能加载en_core_web_sm
+解决方法：python -m spacy download en_core_web_sm
+
+
+ValueError: Unknown layer: ProductLayer
