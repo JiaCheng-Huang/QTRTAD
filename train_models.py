@@ -16,7 +16,7 @@ if __name__ == '__main__':
     seq_length = 200  # 分句长度
     embedding_dim = 50
     VOCAB_SIZE = 50000
-    CLAUSE_NUM = 2
+    CLAUSE_NUM = 3
 
     train_texts, train_labels, test_texts, test_labels = data_helper.split_imdb_files()
     tokenizer = Tokenizer(num_words=VOCAB_SIZE)
