@@ -6,7 +6,7 @@ import glove_utils
 import os
 import sys
 
-from models.QNN import QNN
+from models.QNN_backup import QNN
 from models.QTRT import QTRTnn
 
 import numpy as np
@@ -45,6 +45,9 @@ def fool_text_classifier(model, y_test, test_texts):
 
     classes_prediction = model.predict_classes(test_texts)
 
+    t = Tokenizer(num_words=VOCAB_SIZE)
+    t.fit_on_texts(train_texts)
+
     print('Crafting adversarial examples...')
     model_name = model.__class__.__name__
     adv_text_path = 'fool_result/adv_%s.txt' % model_name
@@ -56,7 +59,7 @@ def fool_text_classifier(model, y_test, test_texts):
                                                     true_y=np.argmax(
                                                         y_test[index]),
                                                     grad_guide=model,
-                                                    tokenizer=tokenizer,
+                                                    tokenizer=t,
                                                     dataset='imdb')
             print('{}. Adversarial example crafted.'.format(index))
 
@@ -75,7 +78,7 @@ if __name__ == '__main__':
 
     train_texts, train_labels, test_texts, test_labels = data_helper.split_imdb_files()
     tokenizer = Tokenizer(num_words=VOCAB_SIZE)
-    tokenizer.fit_on_texts(train_texts + test_texts)
+    tokenizer.fit_on_texts(train_texts)
 
     test_texts = test_texts[: SAMPLES_CAP]
     y_test = np.array(test_labels)

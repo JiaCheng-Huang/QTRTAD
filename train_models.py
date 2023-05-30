@@ -6,7 +6,7 @@ from keras_preprocessing.text import Tokenizer
 
 import data_helper
 import glove_utils
-from models.QNN import QNN
+from models.QNN_backup import QNN
 from models.QTRT import QTRTnn
 from models.TextCNN import TextCNN
 
@@ -20,7 +20,7 @@ if __name__ == '__main__':
 
     train_texts, train_labels, test_texts, test_labels = data_helper.split_imdb_files()
     tokenizer = Tokenizer(num_words=VOCAB_SIZE)
-    tokenizer.fit_on_texts(train_texts + test_texts)
+    tokenizer.fit_on_texts(train_texts)
 
     # 加载预训练的GloVe词向量
     glove_model = glove_utils.loadGloveModel('glove.6B.50d.txt')
@@ -35,4 +35,4 @@ if __name__ == '__main__':
                            ReduceLROnPlateau(monitor='val_acc', patience=2)]
                 , validation_split=0.2)
     scores = model.evaluate(test_texts, test_labels)
-    model.save('qnn.hdf5')
+    model.save('checkpoint/qnn.hdf5')
