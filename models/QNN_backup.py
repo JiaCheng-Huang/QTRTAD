@@ -4,6 +4,7 @@ from keras import Model
 from keras.engine.saving import load_model
 from keras.layers import *
 from keras.optimizers import RMSprop
+from keras.utils import to_categorical
 from keras_preprocessing.sequence import pad_sequences
 
 from layers.embedding import phase_embedding_layer, amplitude_embedding_layer
@@ -35,9 +36,10 @@ class QNN:
                                                       l2_reg=0.0000005)(doc)
 
         [seq_embedding_real, seq_embedding_imag] = ComplexMultiply()([phase_encoded, amplitude_encoded])
-        [sentence_embedding_real, sentence_embedding_imag] = ComplexMixture()([seq_embedding_real, seq_embedding_imag, weight])
+        [sentence_embedding_real, sentence_embedding_imag] = ComplexMixture()(
+            [seq_embedding_real, seq_embedding_imag, weight])
         probs = ComplexMeasurement(units=30)([sentence_embedding_real, sentence_embedding_imag])
-        output = Dense(2, activation='sigmoid', kernel_regularizer=regularizers.l2(0))(probs)
+        output = Dense(2, activation='softmax', kernel_regularizer=regularizers.l2(0))(probs)
         model = Model(doc, output)
         model.compile(loss='categorical_crossentropy', optimizer=RMSprop(lr=0.0001, decay=0.0), metrics=['accuracy'])
         return model
@@ -53,7 +55,8 @@ class QNN:
     def train(self, train_texts, train_labels, batch_size, epochs, callbacks, validation_split):
         x = self.tokenizer.texts_to_sequences(train_texts)
         x = pad_sequences(x, maxlen=self.seq_length, dtype='int32', padding='post', truncating='post')
-        y = np.array(train_labels)
+        y = to_categorical(train_labels)
+        y = np.array(y)
         self.model.summary()
         self.model.fit(x, y, batch_size=batch_size, epochs=epochs,
                        callbacks=callbacks,
@@ -62,7 +65,8 @@ class QNN:
     def evaluate(self, test_texts, test_labels):
         x = self.tokenizer.texts_to_sequences(test_texts)
         x = pad_sequences(x, maxlen=self.seq_length, dtype='int32', padding='post', truncating='post')
-        y = np.array(test_labels)
+        y = to_categorical(test_labels)
+        y = np.array(y)
         scores = self.model.evaluate(x, y)
         print('test_loss: %f, accuracy: %f' % (scores[0], scores[1]))
         return scores
@@ -80,3 +84,6 @@ class QNN:
     def predict_prob(self, texts):
         prob = self.predict(texts).squeeze()
         return prob
+
+    def get_model(self):
+        return self.model

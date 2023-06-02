@@ -12,9 +12,9 @@ def read_imdb_files(filetype):
     # [0,1] means positive，[1,0] means negative
     all_labels = []
     for _ in range(12500):
-        all_labels.append([0, 1])
+        all_labels.append(1)
     for _ in range(12500):
-        all_labels.append([1, 0])
+        all_labels.append(0)
 
     all_texts = []
     file_list = []

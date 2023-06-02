@@ -7,7 +7,6 @@ import os
 import sys
 
 from models.QNN_backup import QNN
-from models.QTRT import QTRTnn
 
 import numpy as np
 import tensorflow as tf
@@ -37,8 +36,8 @@ def write_origin_input_texts(origin_input_texts_path, test_texts, test_samples_c
 
 
 def fool_text_classifier(model, y_test, test_texts):
-    if not os.path.exists('fool_result'):
-        os.mkdir('fool_result')
+    if not os.path.exists('PWWS/fool_result'):
+        os.mkdir('PWWS/fool_result')
     clean_texts_path = 'clean.txt'
     if not os.path.isfile(clean_texts_path):
         write_origin_input_texts(clean_texts_path, test_texts)
@@ -46,12 +45,12 @@ def fool_text_classifier(model, y_test, test_texts):
     classes_prediction = model.predict_classes(test_texts)
 
     t = Tokenizer(num_words=VOCAB_SIZE)
-    t.fit_on_texts(train_texts)
+    t.fit_on_texts(test_texts)
 
     print('Crafting adversarial examples...')
     model_name = model.__class__.__name__
-    adv_text_path = 'fool_result/adv_%s.txt' % model_name
-    file = open(adv_text_path, "a")
+    adv_text_path = 'PWWS/fool_result/adv_%s.txt' % model_name
+    file = open(adv_text_path, "a",encoding='utf-8')
     for index, text in enumerate(test_texts):
         if np.argmax(y_test[index]) == classes_prediction[index]:
             # If the ground_true label is the same as the predicted label
@@ -89,7 +88,8 @@ if __name__ == '__main__':
                                                                VOCAB_SIZE)
     embedding_matrix = np.transpose(embedding_matrix)
     # model = QTRTnn(embedding_matrix, tokenizer, seq_length, embedding_dim, VOCAB_SIZE, CLAUSE_NUM)
-    model = QNN(embedding_matrix, tokenizer, seq_length, embedding_dim, VOCAB_SIZE, CLAUSE_NUM)
-    # model = TextCNN(embedding_matrix, tokenizer, seq_length, embedding_dim, VOCAB_SIZE)
-    model.load('checkpoint/qnn.hdf5')
+    # model = QNN(embedding_matrix, tokenizer, seq_length, embedding_dim, VOCAB_SIZE, CLAUSE_NUM)
+    model = TextCNN(embedding_matrix, tokenizer, seq_length, embedding_dim, VOCAB_SIZE)
+    model.load('checkpoint/cnn.hdf5')
+    model.evaluate(test_texts, test_labels[:SAMPLES_CAP])
     fool_text_classifier(model, y_test, test_texts)

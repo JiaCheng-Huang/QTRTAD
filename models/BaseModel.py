@@ -1,5 +1,6 @@
 from keras.engine.saving import load_model
 from keras.layers import *
+from keras.utils import to_categorical
 from keras_preprocessing.sequence import pad_sequences
 
 
@@ -15,7 +16,8 @@ class BaseModel:
     def train(self, train_texts, train_labels, batch_size, epochs, callbacks, validation_split):
         x = self.tokenizer.texts_to_sequences(train_texts)
         x = pad_sequences(x, maxlen=self.seq_length, dtype='int32', padding='post', truncating='post')
-        y = np.array(train_labels)
+        y = to_categorical(train_labels)
+        y = np.array(y)
         self.model.summary()
         self.model.fit(x, y, batch_size=batch_size, epochs=epochs,
                        callbacks=callbacks,
@@ -30,7 +32,8 @@ class BaseModel:
     def evaluate(self, test_texts, test_labels):
         x = self.tokenizer.texts_to_sequences(test_texts)
         x = pad_sequences(x, maxlen=self.seq_length, dtype='int32', padding='post', truncating='post')
-        y = np.array(test_labels)
+        y = to_categorical(test_labels)
+        y = np.array(y)
         scores = self.model.evaluate(x, y)
         print('test_loss: %f, accuracy: %f' % (scores[0], scores[1]))
         return scores

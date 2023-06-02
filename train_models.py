@@ -6,8 +6,8 @@ from keras_preprocessing.text import Tokenizer
 
 import data_helper
 import glove_utils
-from models.QNN_backup import QNN
-from models.QTRT import QTRTnn
+from models.QNN import QNN
+
 from models.TextCNN import TextCNN
 
 # nltk.data.path.append("nltk_data")
@@ -16,7 +16,7 @@ if __name__ == '__main__':
     seq_length = 200  # 分句长度
     embedding_dim = 50
     VOCAB_SIZE = 50000
-    CLAUSE_NUM = 3
+    CLAUSE_NUM = 2
 
     train_texts, train_labels, test_texts, test_labels = data_helper.split_imdb_files()
     tokenizer = Tokenizer(num_words=VOCAB_SIZE)
@@ -35,4 +35,4 @@ if __name__ == '__main__':
                            ReduceLROnPlateau(monitor='val_acc', patience=2)]
                 , validation_split=0.2)
     scores = model.evaluate(test_texts, test_labels)
-    model.save('checkpoint/qnn.hdf5')
+    model.save('checkpoint/qnn_our.hdf5')
