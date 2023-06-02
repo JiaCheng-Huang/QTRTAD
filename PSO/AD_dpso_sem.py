@@ -44,15 +44,15 @@ glove_model = glove_utils.loadGloveModel('glove.6B.50d.txt')
 embedding_matrix, _ = glove_utils.create_embeddings_matrix(glove_model, tokenizer.word_index, 50,
                                                            VOCAB_SIZE)
 embedding_matrix = np.transpose(embedding_matrix)
-model = QNN(embedding_matrix, tokenizer, max_len, 50, VOCAB_SIZE, 2)
-model.load('checkpoint/qnn_our.hdf5')
-# model = TextCNN(embedding_matrix, tokenizer, max_len, 50, VOCAB_SIZE)
-# model.load('checkpoint/cnn.hdf5')
+# model = QNN(embedding_matrix, tokenizer, max_len, 50, VOCAB_SIZE, 5)
+# model.load('checkpoint/qnn_our.hdf5')
+model = TextCNN(embedding_matrix, tokenizer, max_len, 50, VOCAB_SIZE)
+model.load('checkpoint/cnn.hdf5')
 
 f = open('PSO/fool_result/adv_%s.txt' % model.__class__.__name__, mode='w+', encoding='utf-8')
 f_clean = open('PSO/fool_result/clean.txt', mode='w+', encoding='utf-8')
 ga_atttack = PSOAttack(model, word_candidate, tokenizer,
-                       max_iters=20,
+                       max_iters=10,
                        pop_size=pop_size)
 SAMPLE_SIZE = len(test_labels)
 TEST_SIZE = 1000

@@ -3,7 +3,7 @@ from keras.utils import to_categorical
 from tensorflow.python.keras.preprocessing.text import Tokenizer
 import data_helper
 import glove_utils
-from models.QNN_backup import QNN
+from models.QNN import QNN
 
 from models.TextCNN import TextCNN
 
@@ -23,7 +23,7 @@ if __name__ == '__main__':
     embedding_matrix = np.transpose(embedding_matrix)
     # model = QTRTnn(embedding_matrix, tokenizer, seq_length, embedding_dim, VOCAB_SIZE, CLAUSE_NUM)
     model = QNN(embedding_matrix, tokenizer, seq_length, embedding_dim, VOCAB_SIZE, CLAUSE_NUM)
-    model.load('checkpoint/qnn.hdf5')
+    model.load('checkpoint/qnn_our.hdf5')
 
     # model = TextCNN(embedding_matrix, tokenizer, seq_length, embedding_dim, VOCAB_SIZE)
     # model.load('checkpoint/cnn.hdf5')

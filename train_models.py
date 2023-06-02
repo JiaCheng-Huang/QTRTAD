@@ -7,7 +7,7 @@ from keras_preprocessing.text import Tokenizer
 import data_helper
 import glove_utils
 from models.QNN import QNN
-
+from models.BidLSTM import BidLSTM
 from models.TextCNN import TextCNN
 
 # nltk.data.path.append("nltk_data")
@@ -16,7 +16,7 @@ if __name__ == '__main__':
     seq_length = 200  # 分句长度
     embedding_dim = 50
     VOCAB_SIZE = 50000
-    CLAUSE_NUM = 2
+    CLAUSE_NUM = 5
 
     train_texts, train_labels, test_texts, test_labels = data_helper.split_imdb_files()
     tokenizer = Tokenizer(num_words=VOCAB_SIZE)
@@ -27,12 +27,12 @@ if __name__ == '__main__':
     embedding_matrix, _ = glove_utils.create_embeddings_matrix(glove_model, tokenizer.word_index, embedding_dim,
                                                                VOCAB_SIZE)
     embedding_matrix = np.transpose(embedding_matrix)
-    # model = QTRTnn(embedding_matrix, tokenizer, seq_length, embedding_dim, VOCAB_SIZE, CLAUSE_NUM)
+    model = BidLSTM(embedding_matrix, tokenizer, seq_length, embedding_dim, VOCAB_SIZE)
     # model = TextCNN(embedding_matrix, tokenizer, seq_length, embedding_dim, VOCAB_SIZE)
-    model = QNN(embedding_matrix, tokenizer, seq_length, embedding_dim, VOCAB_SIZE, CLAUSE_NUM)
+    # model = QNN(embedding_matrix, tokenizer, seq_length, embedding_dim, VOCAB_SIZE, CLAUSE_NUM)
     model.train(train_texts, train_labels, batch_size=16, epochs=80,
                 callbacks=[EarlyStopping(monitor='val_acc', patience=5),
                            ReduceLROnPlateau(monitor='val_acc', patience=2)]
                 , validation_split=0.2)
     scores = model.evaluate(test_texts, test_labels)
-    model.save('checkpoint/qnn_our.hdf5')
+    model.save('checkpoint/bidlstm.hdf5')
