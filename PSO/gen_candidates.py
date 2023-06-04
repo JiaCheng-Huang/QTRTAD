@@ -1,14 +1,19 @@
 import pickle
 import OpenHowNet
+from keras_preprocessing.text import Tokenizer
 
+import data_helper
+
+train_texts, train_labels, test_texts, test_labels = data_helper.split_imdb_files()
+tokenizer = Tokenizer(num_words=50000)
+tokenizer.fit_on_texts(train_texts)
+d = tokenizer.word_index
 word_candidate = {}
 
-with open('aux_files/dataset_50000.pkl', 'rb') as fh:
-    dataset = pickle.load(fh)
 OpenHowNet.download()
 hownet_dict = OpenHowNet.HowNetDict()
 
-f = open('sss_dict.pkl', 'rb')
+f = open('PSO/sss_dict.pkl', 'rb')
 NNS, NNPS, JJR, JJS, RBR, RBS, VBD, VBG, VBN, VBP, VBZ, inv_NNS, inv_NNPS, inv_JJR, inv_JJS, inv_RBR, inv_RBS, inv_VBD, inv_VBG, inv_VBN, inv_VBP, inv_VBZ = pickle.load(
     f)
 pos_list = ['noun', 'verb', 'adj', 'adv']
@@ -21,15 +26,15 @@ s_adj = ['JJR', 'JJS']
 s_adv = ['RBR', 'RBS']
 word_pos = {}
 word_sem = {}
-word_influction={}
-for w1, i1 in dataset.dict.items():
+word_influction = {}
+for w1, i1 in d.items():
     w1_s_flag = 0
     w1_orig = None
     for s in s_ls:
         if w1 in eval(s):
             w1_s_flag = 1
             w1_orig = eval(s)[w1]
-            word_influction[i1]=s
+            word_influction[i1] = s
             break
     if w1_s_flag == 0:
         w1_orig = w1
@@ -55,9 +60,7 @@ for w1, i1 in dataset.dict.items():
 
 def add_w1(w1, i1):
     word_candidate[i1] = {}
-    w1_pos_sem=word_influction[i1]
-
-
+    w1_pos_sem = word_influction[i1]
 
     w1_pos = set(word_pos[i1])
     for pos in pos_set:
@@ -71,12 +74,12 @@ def add_w1(w1, i1):
     if len(new_w1_sememes) == 0:
         return
 
-    for w2, i2 in dataset.dict.items():
-        if i2>50000:
+    for w2, i2 in d.items():
+        if i2 > 50000:
             break
         if i1 == i2:
             continue
-        w2_pos_sem=word_influction[i2]
+        w2_pos_sem = word_influction[i2]
 
         w2_pos = set(word_pos[i2])
         all_pos = w2_pos & w1_pos & pos_set
@@ -92,7 +95,7 @@ def add_w1(w1, i1):
         # not_in_num1 = count(w1_sememes, w2_sememes)
         # not_in_num2 = count(w2_sememes,w1_sememes)
         # not_in_num=not_in_num1+not_in_num2
-        w_flag=0
+        w_flag = 0
 
         for s1_id in range(len(new_w1_sememes)):
             if w_flag == 1:
@@ -102,7 +105,7 @@ def add_w1(w1, i1):
             if pos_w1 not in pos_set:
                 continue
             for s2_id in range(len(new_w2_sememes)):
-                if w_flag==1:
+                if w_flag == 1:
                     break
                 pos_w2 = word_pos[i2][s2_id]
                 s2 = set(new_w2_sememes[s2_id])
@@ -110,29 +113,22 @@ def add_w1(w1, i1):
                     if w1_pos_sem == 'orig':
                         if w2_pos_sem == 'orig':
                             word_candidate[i1][pos_w1].append(i2)
-                            w_flag=1
+                            w_flag = 1
                             break
                     else:
                         for p in eval('s_' + pos_w1):
                             if w1 in eval(p) and w2 in eval(p):
                                 word_candidate[i1][pos_w1].append(i2)
-                                w_flag=1
+                                w_flag = 1
                                 break
 
 
-
-
-for w1,i1 in dataset.dict.items():
-    if i1>50000:
+for w1, i1 in d.items():
+    if i1 > 50000:
         break
-    print(i1)
+
 
     add_w1(w1, i1)
 
-
-
-f = open('word_candidates_sense.pkl', 'wb')
+f = open('PSO/word_candidates_sense.pkl', 'wb')
 pickle.dump(word_candidate, f)
-
-
-

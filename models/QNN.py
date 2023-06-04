@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-
-from keras import Model
+import numpy as np
+from keras import Model, regularizers
 from keras.engine.saving import load_model
 from keras.layers import *
 from keras.optimizers import RMSprop

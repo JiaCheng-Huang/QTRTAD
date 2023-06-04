@@ -17,7 +17,7 @@ sys.stdout = Unbuffered(sys.stdout)
 nlp = spacy.load('en_core_web_sm', tagger=False, entity=False)
 
 
-def adversarial_paraphrase(input_text, true_y, grad_guide, tokenizer, dataset, level='word', verbose=True):
+def adversarial_paraphrase(input_text, true_y, grad_guide, tokenizer, dataset="imdb", level='word', verbose=True):
     '''
     Compute a perturbation, greedily choosing the synonym if it causes the most
     significant change in the classification probability after replacement
@@ -72,13 +72,13 @@ def adversarial_paraphrase(input_text, true_y, grad_guide, tokenizer, dataset, l
 
     # PWWS
     position_word_list, word_saliency_list = evaluate_word_saliency(doc, grad_guide, tokenizer, true_y, dataset, level)
-    perturbed_text = PWWS(doc,
-                          true_y,
-                          dataset,
-                          word_saliency_list=word_saliency_list,
-                          heuristic_fn=heuristic_fn,
-                          halt_condition_fn=halt_condition_fn,
-                          verbose=verbose)
+    perturbed_text, substitute_count = PWWS(doc,
+                                            true_y,
+                                            dataset,
+                                            word_saliency_list=word_saliency_list,
+                                            heuristic_fn=heuristic_fn,
+                                            halt_condition_fn=halt_condition_fn,
+                                            verbose=verbose)
 
     # print("perturbed_text after perturb_text:", perturbed_text)
     origin_vector = perturbed_vector = None
@@ -96,4 +96,4 @@ def adversarial_paraphrase(input_text, true_y, grad_guide, tokenizer, dataset, l
         raw_score = origin_prob[true_y] - perturbed_prob[true_y]
         print('Prob before: ', origin_prob[true_y], '. Prob after: ', perturbed_prob[true_y],
               '. Prob shift: ', raw_score)
-    return perturbed_text, perturbed_y
+    return perturbed_text, perturbed_y, substitute_count

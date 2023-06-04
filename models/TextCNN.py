@@ -1,4 +1,4 @@
-from keras import Sequential
+from keras import Sequential, regularizers
 from keras.layers import *
 from keras.optimizers import *
 

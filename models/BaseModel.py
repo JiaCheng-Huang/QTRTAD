@@ -1,5 +1,5 @@
+import numpy as np
 from keras.engine.saving import load_model
-from keras.layers import *
 from keras.utils import to_categorical
 from keras_preprocessing.sequence import pad_sequences
 

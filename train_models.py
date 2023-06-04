@@ -9,11 +9,12 @@ import glove_utils
 from models.QNN import QNN
 from models.BidLSTM import BidLSTM
 from models.TextCNN import TextCNN
+from models.Transformer import Transformer
 
 # nltk.data.path.append("nltk_data")
 
 if __name__ == '__main__':
-    seq_length = 200  # 分句长度
+    seq_length = 200
     embedding_dim = 50
     VOCAB_SIZE = 50000
     CLAUSE_NUM = 5
@@ -27,12 +28,13 @@ if __name__ == '__main__':
     embedding_matrix, _ = glove_utils.create_embeddings_matrix(glove_model, tokenizer.word_index, embedding_dim,
                                                                VOCAB_SIZE)
     embedding_matrix = np.transpose(embedding_matrix)
-    model = BidLSTM(embedding_matrix, tokenizer, seq_length, embedding_dim, VOCAB_SIZE)
+    # model = BidLSTM(embedding_matrix, tokenizer, seq_length, embedding_dim, VOCAB_SIZE)
     # model = TextCNN(embedding_matrix, tokenizer, seq_length, embedding_dim, VOCAB_SIZE)
+    model = Transformer(embedding_matrix, tokenizer, seq_length, embedding_dim, VOCAB_SIZE)
     # model = QNN(embedding_matrix, tokenizer, seq_length, embedding_dim, VOCAB_SIZE, CLAUSE_NUM)
     model.train(train_texts, train_labels, batch_size=16, epochs=80,
-                callbacks=[EarlyStopping(monitor='val_acc', patience=5),
-                           ReduceLROnPlateau(monitor='val_acc', patience=2)]
+                callbacks=[EarlyStopping(monitor='val_loss', patience=5),
+                           ReduceLROnPlateau(monitor='val_loss', patience=2)]
                 , validation_split=0.2)
     scores = model.evaluate(test_texts, test_labels)
-    model.save('checkpoint/bidlstm.hdf5')
+    model.save('checkpoint/transformer.hdf5')

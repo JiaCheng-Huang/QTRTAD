@@ -238,8 +238,8 @@ def PWWS(
         if halt_condition_fn(perturbed_text):
             if verbose:
                 print("use", substitute_count, "substitution; use", NE_count, 'NE')
-            return perturbed_text
+            return perturbed_text, substitute_count
 
     if verbose:
         print("use", substitute_count, "substitution; use", NE_count, 'NE')
-    return perturbed_text
+    return perturbed_text, substitute_count

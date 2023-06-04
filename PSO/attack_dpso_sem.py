@@ -146,8 +146,8 @@ class PSOAttack(object):
         x_len = np.sum(np.sign(x_orig))
         x_len = int(x_len)
         pos_list = ['JJ', 'NN', 'RB', 'VB']
-
         neigbhours_list = []
+        # print(len(pos_tags))
         for i in range(x_len):
             if x_adv[i] not in range(1, 50000):
                 neigbhours_list.append([])
@@ -168,7 +168,7 @@ class PSOAttack(object):
                 neigbhours_list.append([neighbor for neighbor in self.candidate[x_adv[i]][pos]])
             else:
                 neigbhours_list.append([])
-
+        # print(neigbhours_list)
         neighbours_len = [len(x) for x in neigbhours_list]
         w_select_probs = []
         for pos in range(x_len):
