@@ -6,10 +6,7 @@ from keras_preprocessing.text import Tokenizer
 
 import data_helper
 import glove_utils
-from models.QNN import QNN
-from models.BidLSTM import BidLSTM
-from models.TextCNN import TextCNN
-from models.Transformer import Transformer
+from models import *
 
 # nltk.data.path.append("nltk_data")
 
@@ -30,11 +27,13 @@ if __name__ == '__main__':
     embedding_matrix = np.transpose(embedding_matrix)
     # model = BidLSTM(embedding_matrix, tokenizer, seq_length, embedding_dim, VOCAB_SIZE)
     # model = TextCNN(embedding_matrix, tokenizer, seq_length, embedding_dim, VOCAB_SIZE)
-    model = Transformer(embedding_matrix, tokenizer, seq_length, embedding_dim, VOCAB_SIZE)
+    # model = Transformer(embedding_matrix, tokenizer, seq_length, embedding_dim, VOCAB_SIZE)
+    model = PlainQNN(embedding_matrix, tokenizer, seq_length, embedding_dim, VOCAB_SIZE)
     # model = QNN(embedding_matrix, tokenizer, seq_length, embedding_dim, VOCAB_SIZE, CLAUSE_NUM)
+    model_name = model.__class__.__name__.lower()
     model.train(train_texts, train_labels, batch_size=16, epochs=80,
                 callbacks=[EarlyStopping(monitor='val_loss', patience=5),
                            ReduceLROnPlateau(monitor='val_loss', patience=2)]
                 , validation_split=0.2)
     scores = model.evaluate(test_texts, test_labels)
-    model.save('checkpoint/transformer.hdf5')
+    model.save('checkpoint/%s.hdf5' % model_name)

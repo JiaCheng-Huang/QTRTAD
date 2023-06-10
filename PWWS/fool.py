@@ -91,7 +91,8 @@ if __name__ == '__main__':
     embedding_matrix = np.transpose(embedding_matrix)
     # model = QNN(embedding_matrix, tokenizer, seq_length, embedding_dim, VOCAB_SIZE, CLAUSE_NUM)
     # model = TextCNN(embedding_matrix, tokenizer, seq_length, embedding_dim, VOCAB_SIZE)
-    model = BidLSTM(embedding_matrix, tokenizer, seq_length, embedding_dim, VOCAB_SIZE)
+    # model = BidLSTM(embedding_matrix, tokenizer, seq_length, embedding_dim, VOCAB_SIZE)
+    model = PlainQNN(embedding_matrix, tokenizer, seq_length, embedding_dim, VOCAB_SIZE)
     # model = Transformer(embedding_matrix, tokenizer, seq_length, embedding_dim, VOCAB_SIZE)
     model_name = model.__class__.__name__
     model.load('checkpoint/%s.hdf5' % model_name)

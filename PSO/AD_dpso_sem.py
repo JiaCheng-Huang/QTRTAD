@@ -38,22 +38,27 @@ glove_model = glove_utils.loadGloveModel('glove.6B.50d.txt')
 embedding_matrix, _ = glove_utils.create_embeddings_matrix(glove_model, tokenizer.word_index, 50,
                                                            VOCAB_SIZE)
 embedding_matrix = np.transpose(embedding_matrix)
-model = QNN(embedding_matrix, tokenizer, max_len, 50, VOCAB_SIZE, 5)
+# model = QNN(embedding_matrix, tokenizer, max_len, 50, VOCAB_SIZE, 5)
 # model = TextCNN(embedding_matrix, tokenizer, max_len, 50, VOCAB_SIZE)
-model.load('checkpoint/qnn.hdf5')
-
+# model = BidLSTM(embedding_matrix, tokenizer, max_len, 50, VOCAB_SIZE)
+model = PlainQNN(embedding_matrix, tokenizer, max_len, 50, VOCAB_SIZE)
+# model = Transformer(embedding_matrix, tokenizer, max_len, 50, VOCAB_SIZE)
 model_name = model.__class__.__name__
+model.load('checkpoint/%s.hdf5' % model_name)
+
 adv_text_path = 'PSO/fool_result/adv_%s.csv' % model_name
 if not os.path.exists(adv_text_path):
     file = open(adv_text_path, "a+", encoding='utf-8')
     file.write('clean' + '\t' + 'adv' + '\t' + 'label' + "\n")
     test_texts = test_texts[:TEST_SIZE]
     test_labels = test_labels[:TEST_SIZE]
+    test_pos_tags = test_pos_tags[:TEST_SIZE]
 else:
     file = open(adv_text_path, "r+", encoding='utf-8')
     lines = len(file.readlines())
     test_texts = test_texts[lines - 1:TEST_SIZE]
     test_labels = test_labels[lines - 1:TEST_SIZE]
+    test_pos_tags = test_pos_tags[lines - 1:TEST_SIZE]
 
 ga_atttack = PSOAttack(model, word_candidate, tokenizer,
                        max_iters=20,
@@ -91,6 +96,7 @@ for i in range(SAMPLE_SIZE):
     orig_preds = model.predict(vector_to_text(x_orig[np.newaxis, :], tokenizer))[0]
     if np.argmax(orig_preds) != orig_label:
         adv_doc = vector_to_text([x_orig], tokenizer)[0]
+        print('%d wrong classified.' % (i + 1))
     else:
         x_adv = ga_atttack.attack(x_orig, target_label, pos_tags)
         if x_adv is None:
@@ -102,7 +108,7 @@ for i in range(SAMPLE_SIZE):
             modify_ratio = num_changes / x_len
             if modify_ratio > 0.25:
                 print('too long:', modify_ratio)
-                dv_doc = vector_to_text([x_orig], tokenizer)[0]
+                adv_doc = vector_to_text([x_orig], tokenizer)[0]
             else:
                 print('success!')
                 adv_doc = vector_to_text([x_adv], tokenizer)[0]

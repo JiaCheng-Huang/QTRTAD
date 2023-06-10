@@ -147,7 +147,8 @@ class PSOAttack(object):
         x_len = int(x_len)
         pos_list = ['JJ', 'NN', 'RB', 'VB']
         neigbhours_list = []
-        # print(len(pos_tags))
+        print(len(pos_tags))
+        print(x_len)
         for i in range(x_len):
             if x_adv[i] not in range(1, 50000):
                 neigbhours_list.append([])

@@ -34,5 +34,6 @@ class TextCNN(BaseModel):
         model.add(Dense(2, activation='softmax', name="dense_one", kernel_regularizer=regularizers.l2(0)))
         model.compile(loss='categorical_crossentropy', optimizer=RMSprop(lr=0.0001), metrics=['accuracy'])
         return model
+
     def get_model(self):
         return self.model
